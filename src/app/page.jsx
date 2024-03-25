@@ -26,8 +26,15 @@ export default function Home() {
       <div className="w-3/10 flex flex-col justify-start items-center border-r border-gray-300 py-8 px-4">
         <Projects projects={projects} handleProjectClick={handleProjectClick} />
       </div>
-      <div className="w-7/10 flex flex-col justify-center items-center py-8 px-4">
-        <Charts selectedProject={selectedProject} />
+      <div className="w-7/10 flex flex-col justify-start items-center py-8">
+        {selectedProject && (
+          <h2 className="text-xl text-sky-900 font-bold mb-4">
+            Charts for {selectedProject}
+          </h2>
+        )}
+        <div className="w-full flex justify-center px-10">
+          <Charts selectedProject={selectedProject} />
+        </div>
       </div>
     </div>
   );

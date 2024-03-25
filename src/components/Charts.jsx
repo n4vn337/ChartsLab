@@ -64,13 +64,9 @@ const Charts = ({ selectedProject }) => {
     <div>
       {selectedProject ? (
         <div>
-          <h2 className="text-xl text-sky-900 font-bold mb-4">
-            Charts for {selectedProject}
-          </h2>
-          <div style={{ width: "500px", height: "300px" }}>
-            {" "}
+          <div style={{ width: "600px", height: "450px" }}>
             {/* Fixed dimensions */}
-            <canvas ref={chartRef} width="500" height="300" />
+            <canvas ref={chartRef} width="800" height="450" />
           </div>
         </div>
       ) : (
