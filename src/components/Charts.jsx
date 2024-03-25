@@ -1,43 +1,61 @@
-"use client";
-
 import React, { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 
 const Charts = ({ selectedProject }) => {
-  const [chartData, setChartData] = useState(null);
+  const [pipelineData, setPipelineData] = useState(null);
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
   useEffect(() => {
-    if (selectedProject) {
-      // Generate dummy chart data based on the selected project
-      const data = {
-        labels: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-        ],
-        datasets: [
+    const fetchPipelineData = async (projectName) => {
+      try {
+        // Fetch pipeline data from GitLab API
+        const response = await fetch(
+          `https://gitlab.example.com/api/v4/projects/${encodeURIComponent(projectName)}/pipelines?status=success`,
           {
-            label: `Data for ${selectedProject}`,
-            data: [65, 59, 80, 81, 56, 55, 40],
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
-            borderColor: "rgba(255, 99, 132, 1)",
-            borderWidth: 1,
+            headers: {
+              Authorization: "Bearer YOUR_ACCESS_TOKEN",
+            },
           },
-        ],
-      };
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch pipeline data");
+        }
+        const data = await response.json();
+        // Process pipeline data
+        processData(data);
+      } catch (error) {
+        console.error("Error fetching pipeline data:", error);
+      }
+    };
 
-      setChartData(data);
+    if (selectedProject) {
+      // Fetch pipeline data for the selected project
+      fetchPipelineData(selectedProject);
     }
   }, [selectedProject]);
 
+  const processData = (data) => {
+    // Process pipeline data to generate chart data
+    const labels = data.map((pipeline) => pipeline.created_at);
+    const successCounts = data.map((pipeline) => pipeline.id); // Change this to count successful pipelines per date
+    const chartData = {
+      labels: labels,
+      datasets: [
+        {
+          label: "Pipeline Success",
+          data: successCounts,
+          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          borderColor: "rgba(75, 192, 192, 1)",
+          borderWidth: 1,
+        },
+      ],
+    };
+    setPipelineData(chartData);
+  };
+
   useEffect(() => {
-    if (chartData) {
+    if (pipelineData) {
       if (chartInstance.current) {
         // If chart instance exists, destroy it before rendering a new one
         chartInstance.current.destroy();
@@ -46,9 +64,18 @@ const Charts = ({ selectedProject }) => {
       const ctx = chartRef.current.getContext("2d");
       chartInstance.current = new Chart(ctx, {
         type: "bar",
-        data: chartData,
+        data: pipelineData,
         options: {
           scales: {
+            x: {
+              type: "time", // Use time scale for date on x-axis
+              time: {
+                unit: "day", // Display dates by day
+                displayFormats: {
+                  day: "MMM D", // Format for displaying dates
+                },
+              },
+            },
             y: {
               beginAtZero: true,
             },
@@ -58,13 +85,13 @@ const Charts = ({ selectedProject }) => {
         },
       });
     }
-  }, [chartData]);
+  }, [pipelineData]);
 
   return (
     <div>
       {selectedProject ? (
         <div>
-          <div style={{ width: "600px", height: "450px" }}>
+          <div style={{ width: "800px", height: "450px" }}>
             {/* Fixed dimensions */}
             <canvas ref={chartRef} width="800" height="450" />
           </div>

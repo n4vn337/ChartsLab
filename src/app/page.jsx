@@ -1,25 +1,43 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Charts from "@/components/Charts";
 import Projects from "@/components/Projects";
 import Image from "next/image";
 
 export default function Home() {
   const [selectedProject, setSelectedProject] = useState(null);
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    // Fetch projects from GitLab API
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch(
+        "https://gitlab.example.com/api/v4/projects",
+        {
+          headers: {
+            Authorization: "Bearer YOUR_ACCESS_TOKEN",
+          },
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch projects");
+      }
+      const data = await response.json();
+      const projectNames = data.map((project) => project.name);
+      setProjects(projectNames);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
+  };
 
   const handleProjectClick = (project) => {
     setSelectedProject(project);
   };
-
-  // Dummy data for projects
-  const projects = [
-    "E-commerce Website Development",
-    "Fitness Tracker Mobile App",
-    "Recipe Sharing Platform",
-    "Personal Finance Management Tool",
-    "Online Learning Platform for Programming",
-  ];
 
   return (
     <div className="flex h-screen bg-gray-100">
