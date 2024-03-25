@@ -1,3 +1,6 @@
+with static data it looks something like this
+![image](https://github.com/n4vn337/ChartsLab/assets/59524376/d7c87fa6-a569-4c14-96db-e639848e8d5f)
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
